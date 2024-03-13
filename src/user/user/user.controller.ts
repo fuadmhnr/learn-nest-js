@@ -1,8 +1,10 @@
 import { Controller, Get, Header, HttpCode, HttpRedirectResponse, Param, Post, Query, Redirect, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { UserService } from './user.service';
 
 @Controller('/api/user')
 export class UserController {
+  constructor(private service: UserService) { }
 
   @Get('/view/hello')
   viewHello(@Query('name') name: string, @Res() response: Response) {
@@ -43,10 +45,9 @@ export class UserController {
 
   @Get('/hello')
   async sayHello(
-    @Query('first_name') firstName: string,
-    @Query('last_name') lastName: string
+    @Query('name') name: string,
   ): Promise<string> {
-    return `Hello ${firstName || ''} ${lastName || ''}`
+    return this.service.sayHello(name)
   }
 
   @Get('/:id')
