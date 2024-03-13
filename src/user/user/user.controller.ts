@@ -1,7 +1,19 @@
-import { Controller, Get, Header, HttpCode, HttpRedirectResponse, Param, Post, Query, Redirect } from '@nestjs/common';
+import { Controller, Get, Header, HttpCode, HttpRedirectResponse, Param, Post, Query, Redirect, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
 
 @Controller('/api/user')
 export class UserController {
+
+  @Get('/set-cookie')
+  setCookie(@Query('name') name: string, @Res() response: Response) {
+    response.cookie('name', name);
+    response.status(200).send('Success set cookie')
+  }
+
+  @Get('/get-cookie')
+  getCookie(@Req() request: Request) {
+    return request.cookies['name']
+  }
 
   @Get('/sample-response')
   @Header('Content-Type', 'application/json')
