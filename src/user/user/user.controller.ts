@@ -1,9 +1,23 @@
-import { Controller, Get, Header, HttpCode, HttpRedirectResponse, Inject, Param, Post, Query, Redirect, Req, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Header,
+  HttpCode,
+  HttpRedirectResponse,
+  Inject,
+  Param,
+  Post,
+  Query,
+  Redirect,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 import { UserService } from './user.service';
 import { Connection } from '../connection/connection';
 import { MailService } from '../mail/mail.service';
 import { UserRepository } from '../user-repository/user-repository';
+import { MemberService } from '../member/member.service';
 
 @Controller('/api/user')
 export class UserController {
@@ -12,34 +26,37 @@ export class UserController {
     private connection: Connection,
     private mailService: MailService,
     @Inject('Mailable') private mailable: MailService,
-    private userRepository: UserRepository
-  ) { }
+    private userRepository: UserRepository,
+    private memberService: MemberService,
+  ) {}
 
   @Get('/connection')
   async getConnection(): Promise<string> {
-    this.userRepository.save()
-    this.mailable.send()
-    this.mailService.send()
-    return this.connection.getName()
+    this.userRepository.save();
+    this.mailable.send();
+    this.mailService.send();
+    console.info(this.memberService.getConnectionName());
+    console.info(this.memberService.sendEmail());
+    return this.connection.getName();
   }
 
   @Get('/view/hello')
   viewHello(@Query('name') name: string, @Res() response: Response) {
     response.render('index.html', {
       title: 'Template Engine Express',
-      name: name
-    })
+      name: name,
+    });
   }
 
   @Get('/set-cookie')
   setCookie(@Query('name') name: string, @Res() response: Response) {
     response.cookie('name', name);
-    response.status(200).send('Success set cookie')
+    response.status(200).send('Success set cookie');
   }
 
   @Get('/get-cookie')
   getCookie(@Req() request: Request) {
-    return request.cookies['name']
+    return request.cookies['name'];
   }
 
   @Get('/sample-response')
@@ -47,8 +64,8 @@ export class UserController {
   @HttpCode(200)
   sampleResponse(): Record<string, string> {
     return {
-      data: 'Hello JSON'
-    }
+      data: 'Hello JSON',
+    };
   }
 
   @Get('/redirect')
@@ -56,25 +73,23 @@ export class UserController {
   redirect(): HttpRedirectResponse {
     return {
       url: '/api/user/sample-response',
-      statusCode: 301
-    }
+      statusCode: 301,
+    };
   }
 
   @Get('/hello')
-  async sayHello(
-    @Query('name') name: string,
-  ): Promise<string> {
-    return this.service.sayHello(name)
+  async sayHello(@Query('name') name: string): Promise<string> {
+    return this.service.sayHello(name);
   }
 
   @Get('/:id')
   getById(@Param('id') id: string): string {
-    return `GET ${id}`
+    return `GET ${id}`;
   }
 
   @Post()
   post(): string {
-    return 'POST'
+    return 'POST';
   }
 
   @Get('/sample')
